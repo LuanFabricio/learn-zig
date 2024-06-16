@@ -1,4 +1,4 @@
-# Zig learn
+# Learn zig
 
 A simple repository to learn about [ziglang](https://ziglang.org/).
 

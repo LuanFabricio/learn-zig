@@ -4,6 +4,7 @@ const Allocator = std.mem.Allocator;
 
 const ray = @cImport({
     @cInclude("/usr/local/include/raylib.h");
+    @cInclude("/usr/local/include/raymath.h");
 });
 
 const Box = @import("box/box.zig").Box;
@@ -55,19 +56,6 @@ const BoxArray = struct {
         self.items = tmp;
     }
 };
-
-fn CherryFromRandom() Box {
-    const rand = std.crypto.random;
-
-    var cherry: Box = undefined;
-    cherry.size.x = 32;
-    cherry.size.y = 32;
-    cherry.color = ray.RED;
-
-    cherry.pos.x = 0 + WIDTH * rand.float(f32);
-    cherry.pos.y = 0 + HEIGHT * rand.float(f32);
-    return cherry;
-}
 
 // TODO: Create a snake module
 const Snake = struct {
@@ -129,6 +117,16 @@ fn SnakeNew(allocator: Allocator, pos: ray.Vector2, move_step: f32, move_directi
     return snake;
 }
 
+fn createCherry() Box {
+    return Box.CherryFromRandom(ray.Vector2Zero(), ray.Vector2{
+        .x = @as(f32, WIDTH),
+        .y = @as(f32, HEIGHT),
+    }, ray.Vector2{
+        .x = 32,
+        .y = 32,
+    }, ray.RED);
+}
+
 pub fn main() !void {
     ray.InitWindow(WIDTH, HEIGHT, "Znake");
     defer ray.CloseWindow();
@@ -136,7 +134,7 @@ pub fn main() !void {
     ray.SetTargetFPS(60);
     const allocator = std.heap.page_allocator;
 
-    var cherry = CherryFromRandom();
+    var cherry = createCherry();
     var snake = try SnakeNew(allocator, ray.Vector2{ .x = WIDTH / 2 - 32, .y = HEIGHT / 2 - 32 }, 1.75, MoveDirection.Up);
     defer BoxArray.deinit(snake.body);
     var score: u32 = 0;
@@ -171,7 +169,7 @@ pub fn main() !void {
         }
 
         if (snake.head.checkCollision(cherry)) {
-            cherry = CherryFromRandom();
+            cherry = createCherry();
             score += 1;
             // TODO: Add a box on the body
             // var clone = snake.head.clone();

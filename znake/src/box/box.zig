@@ -2,6 +2,7 @@ const std = @import("std");
 
 const ray = @cImport({
     @cInclude("/usr/local/include/raylib.h");
+    @cInclude("/usr/local/include/raymath.h");
 });
 
 pub const Box = struct {

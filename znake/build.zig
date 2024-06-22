@@ -55,6 +55,7 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.addIncludePath(.{ .path = "/usr/local/include/raylib.h" });
+    exe.addIncludePath(.{ .path = "/usr/local/include/raymath.h" });
     exe.linkLibC();
     exe.linkSystemLibrary("raylib");
 

@@ -1,11 +1,12 @@
 const std = @import("std");
-const idk = @import("idk/idk.zig");
 
 const Allocator = std.mem.Allocator;
 
 const ray = @cImport({
     @cInclude("/usr/local/include/raylib.h");
 });
+
+const Box = @import("box/box.zig").Box;
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -15,43 +16,6 @@ const MoveDirection = enum(usize) {
     Right,
     Up,
     Down,
-};
-
-// TODO: Create a box module
-const Box = struct {
-    pos: ray.Vector2,
-    size: ray.Vector2,
-    color: ray.Color,
-
-    fn init(x: f32, y: f32, w: f32, h: f32, color: ray.Color) Box {
-        return .{
-            .pos = ray.Vector2{
-                .x = x,
-                .y = y,
-            },
-            .size = ray.Vector2{
-                .x = w,
-                .y = h,
-            },
-            .color = color,
-        };
-    }
-
-    fn clone(self: *const Box) Box {
-        return .{
-            .pos = self.pos,
-            .size = self.size,
-            .color = self.color,
-        };
-    }
-
-    fn draw(self: *const Box) void {
-        ray.DrawRectangleV(self.pos, self.size, self.color);
-    }
-
-    fn checkCollision(self: *Box, other: Box) bool {
-        return self.pos.x <= other.pos.x + other.size.x and self.pos.x + self.size.x >= other.pos.x and self.pos.y <= other.pos.y + other.size.y and self.pos.y + self.size.y >= other.pos.y;
-    }
 };
 
 const BoxArray = struct {
@@ -115,8 +79,8 @@ const Snake = struct {
     fn draw(self: *Snake) void {
         self.head.draw();
 
-        for (self.body.items) |box| {
-            box.draw();
+        for (self.body.items) |b| {
+            b.draw();
         }
     }
 
@@ -198,11 +162,12 @@ pub fn main() !void {
             defer ray.EndDrawing();
 
             ray.ClearBackground(ray.RAYWHITE);
-            const score_str = try std.fmt.allocPrintZ(allocator, "Score: {d}", .{score});
 
-            ray.DrawText(score_str, 20, 20, 20, ray.LIGHTGRAY);
             snake.draw();
             cherry.draw();
+
+            const score_str = try std.fmt.allocPrintZ(allocator, "Score: {d}", .{score});
+            ray.DrawText(score_str, 20, 20, 20, ray.LIGHTGRAY);
         }
 
         if (snake.head.checkCollision(cherry)) {

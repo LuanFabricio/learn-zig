@@ -19,6 +19,15 @@ pub fn build(b: *std.Build) void {
         },
     );
 
+    _ = b.addModule(
+        "box",
+        .{
+            .root_source_file = .{
+                .path = "src/box/box.zig",
+            },
+        },
+    );
+
     // Standard optimization options allow the person running `zig build` to select
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
     // set a preferred release mode, allowing the user to decide how to optimize.

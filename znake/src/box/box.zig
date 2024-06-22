@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const Allocator = std.mem.Allocator;
+
 const ray = @cImport({
     @cInclude("/usr/local/include/raylib.h");
     @cInclude("/usr/local/include/raymath.h");
@@ -49,5 +51,43 @@ pub const Box = struct {
 
     pub fn checkCollision(self: *Box, other: Box) bool {
         return self.pos.x <= other.pos.x + other.size.x and self.pos.x + self.size.x >= other.pos.x and self.pos.y <= other.pos.y + other.size.y and self.pos.y + self.size.y >= other.pos.y;
+    }
+};
+
+pub const BoxArray = struct {
+    pos: usize,
+    items: []Box,
+    allocator: Allocator,
+
+    pub fn init(allocator: Allocator) !BoxArray {
+        return .{
+            .pos = 0,
+            .allocator = allocator,
+            .items = try allocator.alloc(Box, 1),
+        };
+    }
+
+    pub fn deinit(self: BoxArray) void {
+        self.allocator.free(self.items);
+    }
+
+    pub fn add(self: *BoxArray, value: Box) !void {
+        const pos = self.pos;
+        const len = self.items.len;
+
+        if (pos >= len) {
+            try self.realloc();
+        }
+
+        self.items[self.pos] = value;
+        self.pos += 1;
+    }
+
+    fn realloc(self: *BoxArray) !void {
+        const len = self.items.len;
+        var tmp = try self.allocator.alloc(Box, len * 2);
+
+        @memcpy(tmp[0..len], self.items);
+        self.items = tmp;
     }
 };

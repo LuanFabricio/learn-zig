@@ -11,15 +11,6 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
 
     _ = b.addModule(
-        "idk",
-        .{
-            .root_source_file = .{
-                .path = "src/idk/idk.zig",
-            },
-        },
-    );
-
-    _ = b.addModule(
         "box",
         .{
             .root_source_file = .{

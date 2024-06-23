@@ -63,7 +63,7 @@ pub const BoxArray = struct {
         return .{
             .pos = 0,
             .allocator = allocator,
-            .items = try allocator.alloc(Box, 1),
+            .items = try allocator.alloc(Box, 0),
         };
     }
 
@@ -85,7 +85,8 @@ pub const BoxArray = struct {
 
     fn realloc(self: *BoxArray) !void {
         const len = self.items.len;
-        var tmp = try self.allocator.alloc(Box, len * 2);
+        const newLen = if (len > 0) len * 2 else 2;
+        var tmp = try self.allocator.alloc(Box, newLen);
 
         @memcpy(tmp[0..len], self.items);
         self.items = tmp;

@@ -36,22 +36,9 @@ pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
     var cherry = createCherry();
-    var player = try Snake.init(allocator, ray.Vector2{ .x = WIDTH / 2 - 32, .y = HEIGHT / 2 - 32 }, 1.75, MoveDirection.Up);
+    var player = try Snake.init(allocator, ray.Vector2{ .x = WIDTH / 2 - 32, .y = HEIGHT / 2 - 32 }, 32, MoveDirection.Up);
     defer BoxArray.deinit(player.body);
     var score: u32 = 0;
-
-    var blocks = try BoxArray.init(allocator);
-    defer BoxArray.deinit(blocks);
-
-    const boxs: [3]Box = .{
-        Box.init(42, 42, 32, 32, ray.BLUE),
-        Box.init(72, 42, 32, 32, ray.RED),
-        Box.init(42, 72, 32, 32, ray.GRAY),
-    };
-
-    inline for (boxs) |v| {
-        try blocks.add(v);
-    }
 
     while (!ray.WindowShouldClose()) {
         player.updateDirection();
@@ -72,10 +59,7 @@ pub fn main() !void {
         if (player.head.checkCollision(cherry)) {
             cherry = createCherry();
             score += 1;
-            // TODO: Add a box on the body
-            // var clone = player.head.clone();
-            // clone.pos.x += clone.size.x;
-            // try player.body.add(clone);
+            try player.increaseBody();
         }
     }
 }
